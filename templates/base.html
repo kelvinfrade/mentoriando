@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorando</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <style>
+        /* Tema Light */
+        html.light {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #e2e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #cbd5e1;
+        }
+
+        /* Tema Dark (padrão) */
+        html.dark {
+            --bg-primary: #040e1b;
+            --bg-secondary: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        /* Classes de tema aplicáveis */
+        .theme-bg-primary { background-color: var(--bg-primary); }
+        .theme-bg-secondary { background-color: var(--bg-secondary); }
+        .theme-bg-card { background-color: var(--bg-card); }
+        .theme-text-primary { color: var(--text-primary); }
+        .theme-text-secondary { color: var(--text-secondary); }
+        .theme-border { border-color: var(--border-color); }
+
+        /* Transição suave para mudança de tema */
+        html.light body,
+        html.dark body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Override para conteúdo principal em light mode */
+        html.light .bg-\[\\#040e1b\],
+        html.light .bg-slate-900 {
+            background-color: var(--bg-primary) !important;
+        }
+
+        html.light .text-gray-100,
+        html.light .text-gray-200,
+        html.light .text-white {
+            color: var(--text-primary) !important;
+        }
+
+        html.light .text-gray-400,
+        html.light .text-gray-500 {
+            color: var(--text-secondary) !important;
+        }
+
+        html.light .bg-white\/5 {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        html.light .outline-white\/10 {
+            outline-color: rgba(0, 0, 0, 0.15) !important;
+        }
+
+        html.light header#navbar-header {
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        html.light header#navbar-header a,
+        html.light header#navbar-header button {
+            color: #334155 !important;
+        }
+
+        html.light header#navbar-header a:hover {
+            color: #4f46e5 !important;
+        }
+
+        html.light #mobile-menu {
+            background-color: #ffffff !important;
+        }
+
+        html.light .divide-white\/5 > :not(:last-child) {
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light .border-white\/10 {
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html.light .border-gray-600 {
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light .bg-gray-700\/40 {
+            background-color: rgba(148, 163, 184, 0.3) !important;
+        }
+
+        html.light .ring-white\/10 {
+            --tw-ring-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html.light .bg-green-400\/10 {
+            background-color: rgba(74, 222, 128, 0.2) !important;
+        }
+
+        html.light input[type="text"],
+        html.light input[type="password"],
+        html.light input[type="file"],
+        html.light input[type="datetime-local"],
+        html.light select,
+        html.light textarea {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        html.light option {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
+    </style>
+
+    <!-- Inicializar tema antes da renderização para evitar flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.className = savedTheme;
+        })();
+    </script>
+
+    {% block 'head' %}{% endblock 'head' %}
+</head>
+<body class="theme-bg-primary theme-text-primary">
+    {% block 'body' %}{% endblock 'body' %}
+
+    <script>
+        // Menu mobile toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            menuToggle.addEventListener('mouseover', function() {
+                menuToggle.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            });
+
+            menuToggle.addEventListener('mouseout', function() {
+                menuToggle.style.backgroundColor = '';
+            });
+        }
+
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('mouseover', function() {
+                item.style.backgroundColor = 'rgba(255,255,255,0.05)';
+            });
+
+            item.addEventListener('mouseout', function() {
+                item.style.backgroundColor = '';
+            });
+        });
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.className;
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.className = newTheme;
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcons(newTheme);
+        }
+
+        function updateThemeIcons(theme) {
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            const mobileThemeIcon = document.getElementById('mobile-theme-icon');
+            
+            if (sunIcon && moonIcon) {
+                if (theme === 'light') {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+            }
+            
+            if (mobileThemeIcon) {
+                mobileThemeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+            }
+        }
+
+        // Inicializar ícones no carregamento
+        updateThemeIcons(localStorage.getItem('theme') || 'dark');
+    </script>
+</body>
+</html>

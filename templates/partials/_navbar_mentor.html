@@ -1,0 +1,60 @@
+{% load static %}
+<header id="navbar-header" class="bg-slate-900 dark:bg-slate-950 transition-colors duration-300">
+    <nav class="flex items-center justify-between p-4 lg:px-8" aria-label="Global">
+        <div class="flex lg:flex-1">
+            <a href="{% url 'mentorados' %}" class="-m-1.5 p-1.5">
+                <span class="sr-only">Monitorando</span>
+                <img class="h-8 w-auto" src="{% static 'logo.png' %}" alt="">
+            </a>
+        </div>
+        <div class="flex lg:hidden">
+            <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-400 hover:text-white transition-colors" id="menu-toggle">
+                <span class="sr-only">Open main menu</span>
+                <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+        </div>
+        <div class="hidden lg:flex lg:gap-x-12 lg:items-center">
+            <a href="{% url 'mentorados' %}" class="text-sm/6 font-semibold text-gray-100 hover:text-indigo-400 transition-colors">Mentorados</a>         
+            <a href="{% url 'reunioes' %}" class="text-sm/6 font-semibold text-gray-100 hover:text-indigo-400 transition-colors">Reuniões</a>         
+        </div>
+
+        <div class="hidden absolute top-16 left-0 w-full bg-slate-800 shadow-lg lg:hidden z-50" id="mobile-menu">
+            <div class="flex flex-col items-center gap-y-4 py-4">
+                <a href="{% url 'mentorados' %}" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center">Mentorados</a>
+                <a href="{% url 'reunioes' %}" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center">Reuniões</a>
+                <hr class="border-gray-600 w-3/4">
+                <button onclick="toggleTheme()" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center flex items-center justify-center gap-2">
+                    <span id="mobile-theme-icon">🌙</span> Alternar tema
+                </button>
+                <a href="{% url 'logout' %}" class="menu-item text-sm/6 font-semibold text-red-400 hover:text-red-300 transition-colors px-4 py-2 w-full text-center flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                    </svg>
+                    Sair
+                </a>
+            </div>
+        </div>
+
+        <div class="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-4">
+            <!-- Theme Toggle -->
+            <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200" title="Alternar tema">
+                <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                </svg>
+                <svg id="theme-icon-moon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                </svg>
+            </button>
+
+            <!-- Logout -->
+            <a href="{% url 'logout' %}" class="flex items-center gap-2 text-sm/6 font-semibold text-gray-400 hover:text-red-400 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-white/5" title="Sair do sistema">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+                Sair
+            </a>
+        </div>
+    </nav>
+</header>
