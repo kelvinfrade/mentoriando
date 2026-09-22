@@ -61,6 +61,54 @@ def cadastrar_navigator(request):
             messages.add_message(request, constants.ERROR, 'Informe o nome do Navigator.')
     return redirect('mentorados')
 
+@login_required
+def editar_mentorado(request, id):
+    mentorado = Mentorados.objects.filter(id=id, user=request.user).first()
+    if not mentorado:
+        raise Http404
+
+    navigators = Navigators.objects.filter(user=request.user)
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        estagio = request.POST.get('estagio')
+        navigator = request.POST.get('navigator') or None
+        foto = request.FILES.get('foto')
+
+        if navigator and not Navigators.objects.filter(id=navigator, user=request.user).exists():
+            navigator = None
+
+        mentorado.nome = nome
+        mentorado.estagio = estagio
+        mentorado.navigator_id = navigator
+        if foto:
+            mentorado.foto = foto
+        mentorado.save()
+
+        messages.add_message(request, constants.SUCCESS, 'Mentorado atualizado com sucesso.')
+        return redirect('mentorados')
+
+    return render(request, 'editar_mentorado.html', {
+        'mentorado': mentorado,
+        'navigators': navigators,
+        'estagios': Mentorados.estagio_choices,
+    })
+
+@login_required
+def excluir_mentorado(request, id):
+    if request.method != 'POST':
+        raise Http404
+
+    mentorado = Mentorados.objects.filter(id=id, user=request.user).first()
+    if not mentorado:
+        raise Http404
+
+    Tarefa.objects.filter(mentorado=mentorado).delete()
+    Upload.objects.filter(mentorado=mentorado).delete()
+    mentorado.delete()
+    messages.add_message(request, constants.SUCCESS, 'Mentorado excluído com sucesso.')
+    return redirect('mentorados')
+
 @login_required    
 def reunioes(request):
     if request.method == 'GET':
