@@ -65,19 +65,26 @@ def cadastrar_navigator(request):
 def reunioes(request):
     if request.method == 'GET':
         reunioes = Reuniao.objects.filter(data__mentor=request.user)
-        return render(request, 'reunioes.html', {'reunioes':reunioes})
+        disponibilidades = DisponibilidadedeHorarios.objects.filter(
+            mentor=request.user,
+            agendado=False
+        ).order_by('data_inicial')
+        return render(request, 'reunioes.html', {
+            'reunioes': reunioes,
+            'disponibilidades': disponibilidades
+        })
     elif request.method =='POST':
         data = request.POST.get('data')
         data = datetime.strptime(data, '%Y-%m-%dT%H:%M')
         
-        #verifica se existe algum horario 50 minutos antes ou 50 minutos depois, pois se tiver não tem como marcar
+        # Impede horários sobrepostos ou com menos de uma hora de intervalo.
         disponibilidades = DisponibilidadedeHorarios.objects.filter(mentor=request.user).filter(
-            data_inicial__gte = (data - timedelta(minutes=50)),
-            data_inicial__lte = (data + timedelta(minutes=50))
+            data_inicial__gte = (data - timedelta(minutes=60)),
+            data_inicial__lte = (data + timedelta(minutes=60))
         )
 
         if disponibilidades.exists():
-            messages.add_message(request, constants.ERROR, 'Você já possui um reunião em aberto.')
+            messages.add_message(request, constants.ERROR, 'Já existe um horário dentro do intervalo de uma hora antes ou depois.')
             return redirect('reunioes')
         
         disponibilidades = DisponibilidadedeHorarios(
@@ -184,18 +191,26 @@ def agendar_reuniao(request):
         horario_id = request.POST.get('horario')
         tag = request.POST.get('tag')
         descricao = request.POST.get('descricao')
+
+        horario = DisponibilidadedeHorarios.objects.filter(
+            id=horario_id,
+            mentor=mentorado.user,
+            agendado=False
+        ).first()
+        if not horario:
+            messages.add_message(request, constants.ERROR, 'Esse horário não está mais disponível.')
+            return redirect('escolher_dia')
         
         #Atomicidade
         
         reuniao = Reuniao(
-            data_id=horario_id,
+            data=horario,
             mentorado=mentorado,
             tag=tag,
             descricao=descricao
         )
         reuniao.save()
         
-        horario = DisponibilidadedeHorarios.objects.get(id=horario_id)
         horario.agendado = True
         horario.save()
         

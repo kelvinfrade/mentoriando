@@ -9,6 +9,38 @@ venv/
 env/
 ENV/
 
+# Banco de dados local e arquivos de desenvolvimento
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Uploads e arquivos gerados pela aplicação
+media/*
+!media/.gitkeep
+staticfiles/
+
+# Variáveis de ambiente e segredos locais
+.env
+.env.*
+!.env.example
+*.secret
+*.pem
+*.key
+
+# Logs e arquivos temporários
+*.log
+logs/
+tmp/
+temp/
+
+# Testes, cobertura e ferramentas Python
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
 # IDEs (Configurações locais)
 .vscode/
 .idea/

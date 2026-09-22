@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="dark">
+<html lang="pt-br" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,44 +7,82 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <style>
-        /* Tema Light */
         html.light {
-            --bg-primary: #f1f5f9;
+            --bg-primary: #f8fafc;
             --bg-secondary: #e2e8f0;
             --bg-card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
+            --text-primary: #172033;
+            --text-secondary: #526071;
             --border-color: #cbd5e1;
+            --field-bg: #ffffff;
+            --header-bg: #ffffff;
         }
 
-        /* Tema Dark (padrão) */
         html.dark {
-            --bg-primary: #040e1b;
-            --bg-secondary: #0f172a;
-            --bg-card: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
+            --bg-primary: #07111f;
+            --bg-secondary: #0f1d31;
+            --bg-card: #14243a;
+            --text-primary: #f3f7fb;
+            --text-secondary: #a8b5c7;
+            --border-color: #30435c;
+            --field-bg: #0d1a2c;
+            --header-bg: #0b1728;
         }
 
-        /* Classes de tema aplicáveis */
-        .theme-bg-primary { background-color: var(--bg-primary); }
-        .theme-bg-secondary { background-color: var(--bg-secondary); }
-        .theme-bg-card { background-color: var(--bg-card); }
-        .theme-text-primary { color: var(--text-primary); }
-        .theme-text-secondary { color: var(--text-secondary); }
-        .theme-border { border-color: var(--border-color); }
+        html, body {
+            min-height: 100%;
+        }
 
-        /* Transição suave para mudança de tema */
-        html.light body,
-        html.dark body {
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Override para conteúdo principal em light mode */
-        html.light .bg-\[\\#040e1b\],
-        html.light .bg-slate-900 {
+        header#navbar-header,
+        header.app-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .theme-bg-primary { background-color: var(--bg-primary) !important; }
+        .theme-bg-secondary { background-color: var(--bg-secondary) !important; }
+        .theme-bg-card { background-color: var(--bg-card) !important; }
+        .theme-text-primary { color: var(--text-primary) !important; }
+        .theme-text-secondary { color: var(--text-secondary) !important; }
+        .theme-border { border-color: var(--border-color) !important; }
+
+        html.light [class*="bg-[#040e1b]"],
+        html.light [class*="bg-[#05101d]"],
+        html.light .bg-slate-900,
+        html.light .bg-slate-950,
+        html.light .bg-gray-900 {
             background-color: var(--bg-primary) !important;
+        }
+
+        html.light [class*="bg-[#0b1526]"] {
+            background-color: var(--bg-card) !important;
+        }
+
+        html.light .bg-gray-800 {
+            background-color: var(--bg-card) !important;
+        }
+
+        html.dark [class*="bg-[#040e1b]"],
+        html.dark [class*="bg-[#05101d]"] {
+            background-color: var(--bg-primary) !important;
+        }
+
+        html.light #navbar-header,
+        html.light #mobile-menu {
+            background-color: var(--header-bg) !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+        }
+
+        html.dark #navbar-header,
+        html.dark #mobile-menu {
+            background-color: var(--header-bg) !important;
         }
 
         html.light .text-gray-100,
@@ -58,54 +96,28 @@
             color: var(--text-secondary) !important;
         }
 
-        html.light .bg-white\/5 {
-            background-color: rgba(0, 0, 0, 0.05) !important;
+        html.light .bg-white\/5,
+        html.light .bg-gray-700\/40 {
+            background-color: var(--field-bg) !important;
         }
 
-        html.light .outline-white\/10 {
-            outline-color: rgba(0, 0, 0, 0.15) !important;
-        }
-
-        html.light header#navbar-header {
-            background-color: #ffffff !important;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        html.light header#navbar-header a,
-        html.light header#navbar-header button {
-            color: #334155 !important;
-        }
-
-        html.light header#navbar-header a:hover {
-            color: #4f46e5 !important;
-        }
-
-        html.light #mobile-menu {
-            background-color: #ffffff !important;
+        html.light .border-white\/10,
+        html.light .border-gray-600,
+        html.light .ring-white\/10 {
+            border-color: var(--border-color) !important;
+            --tw-ring-color: var(--border-color) !important;
         }
 
         html.light .divide-white\/5 > :not(:last-child) {
-            border-color: rgba(0, 0, 0, 0.08) !important;
+            border-color: var(--border-color) !important;
         }
 
-        html.light .border-white\/10 {
-            border-color: rgba(0, 0, 0, 0.1) !important;
-        }
-
-        html.light .border-gray-600 {
-            border-color: #cbd5e1 !important;
-        }
-
-        html.light .bg-gray-700\/40 {
-            background-color: rgba(148, 163, 184, 0.3) !important;
-        }
-
-        html.light .ring-white\/10 {
-            --tw-ring-color: rgba(0, 0, 0, 0.1) !important;
-        }
-
-        html.light .bg-green-400\/10 {
-            background-color: rgba(74, 222, 128, 0.2) !important;
+        input,
+        select,
+        textarea {
+            background-color: var(--field-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
         }
 
         html.light input[type="text"],
@@ -114,21 +126,35 @@
         html.light input[type="datetime-local"],
         html.light select,
         html.light textarea {
-            background-color: #f8fafc !important;
-            color: #0f172a !important;
-            border: 1px solid #cbd5e1 !important;
+            background-color: var(--field-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
         }
 
         html.light option {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
         }
+
+        .global-theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 60;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 0.5rem 0.75rem;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
     </style>
 
     <!-- Inicializar tema antes da renderização para evitar flash -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.className = savedTheme;
         })();
     </script>
@@ -136,6 +162,9 @@
     {% block 'head' %}{% endblock 'head' %}
 </head>
 <body class="theme-bg-primary theme-text-primary">
+    <button type="button" class="global-theme-toggle" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema">
+        <span id="global-theme-icon">Tema</span>
+    </button>
     {% block 'body' %}{% endblock 'body' %}
 
     <script>
@@ -171,7 +200,7 @@
         // Theme toggle
         function toggleTheme() {
             const html = document.documentElement;
-            const currentTheme = html.className;
+            const currentTheme = html.classList.contains('light') ? 'light' : 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             
             html.className = newTheme;
@@ -197,10 +226,16 @@
             if (mobileThemeIcon) {
                 mobileThemeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
             }
+
+            const globalThemeIcon = document.getElementById('global-theme-icon');
+            if (globalThemeIcon) {
+                globalThemeIcon.textContent = theme === 'light' ? 'Modo escuro' : 'Modo claro';
+                globalThemeIcon.parentElement.style.display = document.getElementById('navbar-header') ? 'none' : 'block';
+            }
         }
 
         // Inicializar ícones no carregamento
-        updateThemeIcons(localStorage.getItem('theme') || 'dark');
+        updateThemeIcons(localStorage.getItem('theme') || 'light');
     </script>
 </body>
 </html>

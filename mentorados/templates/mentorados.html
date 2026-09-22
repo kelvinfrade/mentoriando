@@ -94,6 +94,7 @@
                         <th scope="col" class="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">Usuário</th>
                         <th scope="col" class="hidden py-2 pl-0 pr-8 font-semibold sm:table-cell">Estágio</th>
                         <th scope="col" class="py-2 pl-0 pr-4 text-right font-semibold sm:pr-8 sm:text-left lg:pr-20">Status</th>
+                        <th scope="col" class="py-2 pl-0 pr-8 font-semibold md:table-cell lg:pr-20">Código de acesso</th>
                         <th scope="col" class="hidden py-2 pl-0 pr-8 font-semibold md:table-cell lg:pr-20">Data entrada</th>
                         <th scope="col" class="hidden py-2 pl-0 pr-8 font-semibold md:table-cell lg:pr-20">Navigator</th>
                         </tr>
@@ -122,6 +123,12 @@
                                     <div class="hidden text-white sm:block">Ativo</div>
                                 </div>
                             </td>
+                            <td class="py-4 pl-0 pr-8 text-sm/6 text-gray-400 lg:pr-20">
+                                <div class="flex items-center gap-2">
+                                    <code id="token-{{mentorado.id}}" class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-200">{{mentorado.token}}</code>
+                                    <button type="button" class="rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-500" onclick="copiarToken('{{mentorado.id}}')">Copiar</button>
+                                </div>
+                            </td>
                             <td class="hidden py-4 pl-0 pr-8 text-sm/6 text-gray-400 md:table-cell lg:pr-20">{{mentorado.criado_em}}</td>
                             <td class="hidden py-4 pl-0 pr-8 text-sm/6 text-gray-400 md:table-cell lg:pr-20">{{mentorado.navigator.nome}}</td>
                         </tr>
@@ -148,6 +155,13 @@
             }]
         },
     });
+</script>
+
+<script>
+    function copiarToken(mentoradoId) {
+        const token = document.getElementById(`token-${mentoradoId}`).textContent;
+        navigator.clipboard.writeText(token);
+    }
 </script>
 
 {% endblock 'body' %}
