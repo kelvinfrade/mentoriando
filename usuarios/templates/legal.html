@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block 'body' %}
+<main class="mx-auto max-w-3xl px-6 py-12">
+  <h1 class="text-3xl font-bold">{{ titulo }}</h1>
+  <div class="mt-6 space-y-4 text-gray-600">{% for paragrafo in conteudo %}<p>{{ paragrafo }}</p>{% endfor %}</div>
+</main>
+{% endblock 'body' %}

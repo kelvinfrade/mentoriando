@@ -18,12 +18,14 @@
         <div class="hidden lg:flex lg:gap-x-12 lg:items-center">
             <a href="{% url 'mentorados' %}" class="text-sm/6 font-semibold text-gray-100 hover:text-indigo-400 transition-colors">Mentorados</a>         
             <a href="{% url 'reunioes' %}" class="text-sm/6 font-semibold text-gray-100 hover:text-indigo-400 transition-colors">Reuniões</a>         
+            <a href="{% url 'configurar_mfa' %}" class="text-sm/6 font-semibold text-gray-100 hover:text-indigo-400 transition-colors">Segurança</a>
         </div>
 
         <div class="hidden absolute top-16 left-0 w-full bg-slate-800 shadow-lg lg:hidden z-50" id="mobile-menu">
             <div class="flex flex-col items-center gap-y-4 py-4">
                 <a href="{% url 'mentorados' %}" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center">Mentorados</a>
                 <a href="{% url 'reunioes' %}" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center">Reuniões</a>
+                <a href="{% url 'configurar_mfa' %}" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center">Segurança</a>
                 <hr class="border-gray-600 w-3/4">
                 <button onclick="toggleTheme()" class="menu-item text-sm/6 font-semibold text-gray-200 hover:text-indigo-400 transition-colors px-4 py-2 w-full text-center flex items-center justify-center gap-2">
                     <span id="mobile-theme-icon">🌙</span> Alternar tema
@@ -55,6 +57,7 @@
                 </svg>
                 Sair
             </a>
+            <form method="post" action="{% url 'logout_all' %}" class="inline">{% csrf_token %}<button type="submit" class="text-sm/6 font-semibold text-gray-400 hover:text-red-400 px-3 py-2" title="Encerrar todas as sessões">Sair de todos</button></form>
         </div>
     </nav>
 </header>

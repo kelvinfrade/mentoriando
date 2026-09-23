@@ -4,3 +4,5 @@ pillow==11.2.0
 sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.9.0
+cryptography==44.0.2
+pyotp==2.9.0
