@@ -1,66 +1,209 @@
- # 📘 SistemaGestaoMentorados
+# Mentoriando
 
-Este repositório contém um sistema de gestão de mentorados desenvolvido em **Python** utilizando o framework **Django**, com **Tailwind CSS** para estilização, **SQLite** como banco de dados e **HTML** para as templates. O sistema permite que um mentor crie uma conta, realize login e gerencie seus mentorados. O mentor pode atribuir um "navigator" da equipe para acompanhar de perto as atividades de cada mentorado, criar listas de tarefas e definir horários disponíveis para reuniões. Já o mentorado acessa sua área por meio de um token único, podendo acompanhar suas tarefas e agendar reuniões com o mentor.
+Aplicação web para gestão de mentorados, tarefas, reuniões e horários de atendimento. O projeto utiliza Django, SQLite e templates HTML com Tailwind CSS.
 
-O projeto foi desenvolvido durante o evento **PYSTACK WEEK 13**, uma semana de aprendizado com o Caio da **Pythonando**, a maior escola de desenvolvimento web com Python e Django do Brasil.
+## Sumário
 
----
+- [Visão geral](#visão-geral)
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Requisitos](#requisitos)
+- [Configuração local](#configuração-local)
+- [Execução](#execução)
+- [Testes e qualidade](#testes-e-qualidade)
+- [Fluxo de cadastro](#fluxo-de-cadastro)
+- [Segurança e privacidade](#segurança-e-privacidade)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Operação e produção](#operação-e-produção)
+- [Contribuição](#contribuição)
 
-## 🚀 Funcionalidades Extras Implementadas
+## Visão geral
 
-Além do conteúdo ensinado nas aulas do PYSTACK WEEK 13, implementei as seguintes melhorias no projeto:
+O Mentoriando possui dois públicos principais:
 
-- **Verificação de Data:** Adicionei um código em Python para verificar o dia da semana e o mês de uma data, passando os parâmetros corretos para o HTML, facilitando a exibição de informações dinâmicas.
-- **Menu Hamburguer Responsivo:** Realizei ajustes no CSS para que o menu hamburguer fosse exibido corretamente em janelas pequenas e dispositivos móveis, melhorando a experiência de navegação.
-- **Ajuste de Links:** Corrigi e padronizei os links dos menus em todas as páginas do sistema, garantindo consistência e navegabilidade.
-- **Página de Erro 404 Personalizada:** Criei e configurei uma página personalizada para erros 404 (Not Found), exibida quando alguém acessa um link inexistente.
-- **Redirecionamento da Raiz:** Configurei um redirecionamento da raiz (`http://127.0.0.1:8000`) para a página de mentorados (`http://127.0.0.1:8000/mentorados/`), otimizando o acesso inicial ao sistema.
+- **Mentor:** administra mentorados, navigators, tarefas, reuniões e disponibilidade.
+- **Mentorado:** acessa suas tarefas e agenda reuniões por meio do fluxo autorizado.
 
----
+O sistema segue o padrão MTV do Django e mantém regras de negócio no backend. A interface fornece validações rápidas, mas nenhuma validação de segurança depende exclusivamente do navegador.
 
-## 🧠 Conhecimentos Adquiridos
+## Funcionalidades
 
-O desenvolvimento deste projeto proporcionou um aprendizado profundo em diversas áreas:
+- Cadastro com nome completo, username, e-mail, confirmação de e-mail, CPF e celular.
+- Validação de CPF e celular no frontend e no backend.
+- Bloqueio de duplicidade para username, e-mail, CPF e celular.
+- Confirmação de e-mail por link com token de uso único e validade de 24 horas.
+- Senhas armazenadas pelo sistema de hash do Django.
+- Autenticação multifator TOTP compatível com aplicativos autenticadores.
+- Rate limiting para tentativas de login e MFA.
+- Detecção de novo dispositivo com alerta por e-mail.
+- Revogação de todas as sessões do usuário.
+- CPF e celular cifrados em repouso.
+- Consentimento explícito para tratamento do CPF.
+- Gestão de mentorados, tarefas, reuniões e horários.
 
-- **Arquitetura de Software:** Entendimento da organização de um projeto web, separando responsabilidades entre frontend e backend.
-- **Padrão MTV (Model-Template-View):** Aplicação prática do padrão MTV do Django, compreendendo como models, templates e views interagem para construir um sistema dinâmico.
-- **Desenvolvimento Web com Django:** Criação de rotas, manipulação de formulários, integração com banco de dados e gerenciamento de autenticação de usuários.
-- **Estilização com Tailwind CSS:** Uso de um framework CSS utilitário para criar interfaces modernas e responsivas de forma eficiente.
-- **Gerenciamento de Banco de Dados:** Configuração e uso do SQLite com Django, incluindo migrações e consultas dinâmicas.
-- **Boas Práticas:** Adoção de práticas como redirecionamentos, tratamento de erros e responsividade, essenciais para um sistema web robusto e amigável.
+## Arquitetura
 
----
+| Camada | Responsabilidade |
+| --- | --- |
+| `usuarios` | Cadastro, confirmação de e-mail, login, MFA, sessões e privacidade |
+| `mentorados` | Mentorados, tarefas, reuniões, disponibilidade e tokens de acesso |
+| `core` | Configurações, middleware, URLs raiz e pontos de entrada WSGI/ASGI |
+| `templates` | Layout base e navegação compartilhada |
+| `static` | Arquivos estáticos e recursos administrativos |
+| SQLite | Persistência local por meio do ORM do Django |
 
-## ▶️ Como Executar os Códigos
+As consultas são feitas pelo ORM do Django. O projeto não concatena entrada de usuário em SQL.
 
-1. **Configurar o Ambiente:**
-   - Certifique-se de que o Python está instalado.
-   - Crie e ative um ambiente virtual (recomendado):  
-     - `python -m venv venv`  
-     - No Windows: `venv\Scripts\activate`  
-     - No Linux/macOS: `source venv/bin/activate`
-   - Instale o Django: `pip install django`.
+## Requisitos
 
-2. **Configurar o Banco de Dados:**
-   - Navegue até a pasta do projeto.
-   - Execute as migrações do Django para criar o banco de dados SQLite:  
-     - `python manage.py makemigrations`  
-     - `python manage.py migrate`
+- Python 3.12 ou compatível com Django 5.1.
+- Ambiente virtual recomendado.
+- Dependências listadas em `requirements.txt`.
+- Um backend de e-mail para confirmação de conta e alertas de segurança.
 
-3. **Executar o Sistema:**
-   - Inicie o servidor Django: `python manage.py runserver`.
-   - O sistema estará disponível em `http://127.0.0.1:8000`.
+## Configuração local
 
-4. **Acessar o Sistema:**
-   - Abra o navegador e acesse `http://127.0.0.1:8000`.
-   - Crie uma conta como mentor, faça login e comece a gerenciar mentorados.
+No Windows PowerShell:
 
----
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
 
-## 📥 Como Baixar o Repositório
+No Linux ou macOS:
 
-1. Clique no botão verde "Code" no topo da página do GitHub.
-2. Selecione "Download ZIP" e extraia o arquivo no seu computador.
-3. Ou use o Git: `git clone https://github.com/cstavaresj/SistemaGestaoMentorados.git`
+```bash
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
----
+As variáveis abaixo podem ser configuradas no ambiente:
+
+| Variável | Uso | Padrão local |
+| --- | --- | --- |
+| `SECRET_KEY` | Chave de assinatura e cifragem derivada | Valor definido no arquivo, altere em produção |
+| `EMAIL_BACKEND` | Backend de envio de e-mail | Console do Django |
+| `DEFAULT_FROM_EMAIL` | Remetente das mensagens | `seguranca@mentoriando.local` |
+| `SESSION_COOKIE_SECURE` | Exige HTTPS para cookies de sessão | `True` |
+| `CSRF_COOKIE_SECURE` | Exige HTTPS para cookie CSRF | `True` |
+
+Para desenvolvimento sem HTTPS, use temporariamente:
+
+```powershell
+$env:SESSION_COOKIE_SECURE = "False"
+$env:CSRF_COOKIE_SECURE = "False"
+```
+
+O backend de e-mail de console imprime o link de confirmação no terminal onde o servidor está rodando.
+
+## Execução
+
+Aplique as migrações:
+
+```bash
+python manage.py migrate
+```
+
+Inicie o servidor:
+
+```bash
+python manage.py runserver 127.0.0.1:8000
+```
+
+Acesse:
+
+- Aplicação: <http://127.0.0.1:8000/>
+- Cadastro: <http://127.0.0.1:8000/usuarios/cadastro/>
+- Login: <http://127.0.0.1:8000/usuarios/login/>
+
+Para criar um administrador:
+
+```bash
+python manage.py createsuperuser
+```
+
+## Testes e qualidade
+
+Execute as verificações antes de abrir uma alteração:
+
+```bash
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test
+python -m compileall usuarios core
+```
+
+Os testes cobrem, entre outros cenários:
+
+- validação de CPF e celular;
+- normalização e proteção de dados pessoais;
+- duplicidade de username, e-mail, CPF e celular;
+- confirmação e expiração lógica da ativação de e-mail;
+- bloqueio de login antes da confirmação;
+- MFA e rate limiting.
+
+## Fluxo de cadastro
+
+1. O usuário preenche os dados pessoais, credenciais e consentimento.
+2. O frontend valida formato de e-mail, CPF e celular para feedback imediato.
+3. O backend repete todas as validações e verifica duplicidades.
+4. A conta é criada inativa.
+5. Um token aleatório é enviado para o e-mail informado; somente seu hash é armazenado.
+6. O usuário acessa o link em até 24 horas.
+7. A conta é ativada e pode realizar login.
+
+O celular deve conter 11 dígitos no padrão brasileiro: dois dígitos de DDD, seguidos do nono dígito e mais oito dígitos, por exemplo `(11) 99999-9999`.
+
+## Segurança e privacidade
+
+- Senhas usam os hashers e validadores nativos do Django.
+- CPF e celular são cifrados antes da persistência; hashes separados permitem detectar duplicidades sem expor os valores.
+- Tokens de confirmação são aleatórios, armazenados somente como hash e expiram.
+- Cookies possuem `HttpOnly`, `SameSite=Lax` e configuração `Secure` para HTTPS.
+- Sessões podem ser revogadas por meio de **Sair de todos**.
+- Login e MFA possuem limite temporário de tentativas por IP e usuário.
+- MFA usa TOTP e deve ser ativado em **Segurança**.
+- A finalidade do CPF e os direitos do titular estão documentados em [PRIVACIDADE.md](PRIVACIDADE.md) e [TERMOS_DE_USO.md](TERMOS_DE_USO.md).
+
+Antes de publicar, execute a checklist do Django:
+
+```bash
+python manage.py check --deploy
+```
+
+Em produção, use HTTPS, uma `SECRET_KEY` fora do código, banco gerenciado, backend SMTP, backups cifrados, observabilidade e política de rotação de credenciais.
+
+## Estrutura do projeto
+
+```text
+core/              Configuração e entrada do projeto Django
+mentorados/        Domínio de mentorados, tarefas e reuniões
+usuarios/          Cadastro, autenticação, MFA e privacidade
+templates/         Layouts e navegação compartilhada
+static/            Arquivos estáticos
+manage.py          Comandos administrativos
+requirements.txt   Dependências Python fixadas
+```
+
+## Operação e produção
+
+- Não use `runserver` como servidor de produção.
+- Configure `DEBUG=False` e `ALLOWED_HOSTS` explicitamente.
+- Defina `SECRET_KEY` por variável de ambiente ou secret manager.
+- Configure SMTP real para confirmação de e-mail e alertas.
+- Use HTTPS para que cookies `Secure` funcionem corretamente.
+- Faça backup do banco e do segredo usado para cifragem antes de qualquer migração.
+- Revise logs para não registrar CPF, celular, tokens ou senhas.
+- Rode migrações durante o deploy e valide com `manage.py check --deploy`.
+
+## Contribuição
+
+1. Crie uma branch para a alteração.
+2. Mantenha a mudança focada e preserve as convenções locais.
+3. Adicione ou atualize testes para comportamentos alterados.
+4. Execute `check`, migrações em modo de verificação e a suíte de testes.
+5. Descreva no pull request o problema, a solução, os riscos e como validar.
+
+Não inclua segredos, dados pessoais reais ou o banco de produção no repositório.

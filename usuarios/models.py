@@ -33,6 +33,16 @@ def validate_cpf(value):
 		raise ValidationError('Informe um CPF válido.')
 
 
+def normalize_celular(value):
+	return ''.join(character for character in (value or '') if character.isdigit())
+
+
+def validate_celular(value):
+	celular = normalize_celular(value)
+	if len(celular) != 11 or celular[2] != '9' or celular == celular[0] * 11:
+		raise ValidationError('Informe um celular válido com DDD, por exemplo (11) 99999-9999.')
+
+
 class UserProfile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 	cpf_encrypted = models.TextField()
@@ -44,6 +54,8 @@ class UserProfile(models.Model):
 	email_verified = models.BooleanField(default=False)
 	email_verification_token_hash = models.CharField(max_length=64, blank=True)
 	email_verification_expires_at = models.DateTimeField(null=True, blank=True)
+	celular_encrypted = models.TextField(blank=True)
+	celular_hash = models.CharField(max_length=64, blank=True, null=True, unique=True, db_index=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	def create_email_verification_token(self):
@@ -84,6 +96,20 @@ class UserProfile(models.Model):
 		validate_cpf(normalized)
 		self.cpf_encrypted = _fernet().encrypt(normalized.encode()).decode()
 		self.cpf_hash = hashlib.sha256(normalized.encode()).hexdigest()
+
+	@property
+	def celular(self):
+		try:
+			return _fernet().decrypt(self.celular_encrypted.encode()).decode()
+		except InvalidToken as error:
+			raise ValidationError('Não foi possível ler o celular protegido.') from error
+
+	@celular.setter
+	def celular(self, value):
+		normalized = normalize_celular(value)
+		validate_celular(normalized)
+		self.celular_encrypted = _fernet().encrypt(normalized.encode()).decode()
+		self.celular_hash = hashlib.sha256(normalized.encode()).hexdigest()
 
 	@staticmethod
 	def device_hash(request):

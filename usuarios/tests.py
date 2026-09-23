@@ -18,6 +18,7 @@ class CadastroTests(TestCase):
 			'email': 'pessoa@example.com',
 			'confirmar_email': 'pessoa@example.com',
 			'cpf': '529.982.247-25',
+			'celular': '(11) 99999-9999',
 			'senha': 'SenhaForte!123',
 			'confirmar_senha': 'SenhaForte!123',
 			'consentimento_lgpd': 'on',
@@ -37,14 +38,21 @@ class CadastroTests(TestCase):
 		self.assertFalse(profile.email_verified)
 		self.assertNotEqual(profile.cpf_encrypted, '52998224725')
 		self.assertEqual(profile.cpf, '52998224725')
+		self.assertNotEqual(profile.celular_encrypted, '11999999999')
+		self.assertEqual(profile.celular, '11999999999')
 		self.assertTrue(user.check_password('SenhaForte!123'))
 		self.assertNotEqual(user.password, 'SenhaForte!123')
 
 	def test_cpf_invalido_e_email_diferente_sao_rejeitados(self):
-		form = CadastroForm(self.dados_validos(cpf='111.111.111-11', confirmar_email='outra@example.com'))
+		form = CadastroForm(self.dados_validos(cpf='111.111.111-11', celular='11999999999', confirmar_email='outra@example.com'))
 		self.assertFalse(form.is_valid())
 		self.assertIn('cpf', form.errors)
 		self.assertIn('confirmar_email', form.errors)
+
+	def test_celular_invalido_e_rejeitado(self):
+		form = CadastroForm(self.dados_validos(celular='(11) 8888-9999'))
+		self.assertFalse(form.is_valid())
+		self.assertIn('celular', form.errors)
 
 	def test_username_email_e_cpf_duplicados_sao_rejeitados(self):
 		original = CadastroForm(self.dados_validos())
@@ -54,6 +62,7 @@ class CadastroTests(TestCase):
 		self.assertFalse(duplicado.is_valid())
 		self.assertIn('email', duplicado.errors)
 		self.assertIn('cpf', duplicado.errors)
+		self.assertIn('celular', duplicado.errors)
 		duplicado_username = CadastroForm(self.dados_validos(email='outra@example.com', confirmar_email='outra@example.com'))
 		self.assertFalse(duplicado_username.is_valid())
 		self.assertIn('username', duplicado_username.errors)

@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import UserProfile, normalize_cpf, validate_cpf
+from .models import UserProfile, normalize_celular, normalize_cpf, validate_celular, validate_cpf
 
 
 class CadastroForm(forms.Form):
@@ -14,6 +14,7 @@ class CadastroForm(forms.Form):
     email = forms.EmailField(max_length=254)
     confirmar_email = forms.EmailField(max_length=254)
     cpf = forms.CharField(max_length=14)
+    celular = forms.CharField(max_length=15)
     senha = forms.CharField(widget=forms.PasswordInput)
     confirmar_senha = forms.CharField(widget=forms.PasswordInput)
     consentimento_lgpd = forms.BooleanField(required=True)
@@ -45,6 +46,13 @@ class CadastroForm(forms.Form):
             raise forms.ValidationError('Já existe uma conta com esse CPF.')
         return cpf
 
+    def clean_celular(self):
+        celular = normalize_celular(self.cleaned_data['celular'])
+        validate_celular(celular)
+        if UserProfile.objects.filter(celular_hash=hashlib.sha256(celular.encode()).hexdigest()).exists():
+            raise forms.ValidationError('Já existe uma conta com esse celular.')
+        return celular
+
     def clean(self):
         cleaned_data = super().clean()
         if cleaned_data.get('email') != cleaned_data.get('confirmar_email', '').strip().lower():
@@ -69,5 +77,6 @@ class CadastroForm(forms.Form):
         user.save(update_fields=['is_active'])
         profile = UserProfile(user=user)
         profile.cpf = self.cleaned_data['cpf']
+        profile.celular = self.cleaned_data['celular']
         profile.save()
         return user
