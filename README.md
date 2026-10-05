@@ -1,6 +1,6 @@
 # Mentoriando
 
-Aplicação web para gestão de mentorados, tarefas, reuniões e horários de atendimento. O projeto utiliza Django, SQLite e templates HTML com Tailwind CSS.
+Aplicação web para gestão de mentorados, tarefas, reuniões e horários de atendimento. O projeto utiliza Django, PostgreSQL e templates HTML com Tailwind CSS.
 
 ## Sumário
 
@@ -50,7 +50,7 @@ O sistema segue o padrão MTV do Django e mantém regras de negócio no backend.
 | `core` | Configurações, middleware, URLs raiz e pontos de entrada WSGI/ASGI |
 | `templates` | Layout base e navegação compartilhada |
 | `static` | Arquivos estáticos e recursos administrativos |
-| SQLite | Persistência local por meio do ORM do Django |
+| PostgreSQL | Persistência por meio do ORM do Django; compatível com Azure Database for PostgreSQL |
 
 As consultas são feitas pelo ORM do Django. O projeto não concatena entrada de usuário em SQL.
 
@@ -81,13 +81,32 @@ python -m pip install -r requirements.txt
 
 As variáveis abaixo podem ser configuradas no ambiente:
 
-| Variável | Uso | Padrão local |
+| Variável | Uso | Padrão |
 | --- | --- | --- |
+| `POSTGRES_DB` | Nome do banco PostgreSQL | Sem padrão; obrigatório |
+| `POSTGRES_USER` | Usuário PostgreSQL | Sem padrão; obrigatório |
+| `POSTGRES_PASSWORD` | Senha PostgreSQL | Sem padrão; obrigatório |
+| `POSTGRES_HOST` | Host do servidor Azure, sem `https://` | Sem padrão; obrigatório |
+| `POSTGRES_PORT` | Porta PostgreSQL | `5432` |
+| `POSTGRES_SSLMODE` | Modo TLS da conexão | `require` |
+| `ALLOWED_HOSTS` | Hosts permitidos pelo Django, separados por vírgula | `localhost,127.0.0.1` |
 | `SECRET_KEY` | Chave de assinatura e cifragem derivada | Valor definido no arquivo, altere em produção |
 | `EMAIL_BACKEND` | Backend de envio de e-mail | Console do Django |
 | `DEFAULT_FROM_EMAIL` | Remetente das mensagens | `seguranca@mentoriando.local` |
 | `SESSION_COOKIE_SECURE` | Exige HTTPS para cookies de sessão | `True` |
 | `CSRF_COOKIE_SECURE` | Exige HTTPS para cookie CSRF | `True` |
+
+Configure as credenciais do PostgreSQL no ambiente da aplicação (no Azure, prefira referências ao Key Vault). Exemplo no PowerShell para desenvolvimento:
+
+```powershell
+$env:POSTGRES_DB = "nome-do-banco"
+$env:POSTGRES_USER = "usuario-do-banco"
+$env:POSTGRES_PASSWORD = "senha-do-banco"
+$env:POSTGRES_HOST = "servidor.postgres.database.azure.com"
+```
+
+O host deve corresponder ao servidor Azure e a rede/firewall do servidor deve permitir conexões da aplicação.
+No Azure App Service, configure `ALLOWED_HOSTS` com o domínio atribuído ao app, por exemplo `mentoriando.azurewebsites.net`.
 
 Para desenvolvimento sem HTTPS, use temporariamente:
 
@@ -191,6 +210,7 @@ requirements.txt   Dependências Python fixadas
 
 - Não use `runserver` como servidor de produção.
 - Configure `DEBUG=False` e `ALLOWED_HOSTS` explicitamente.
+- O Gunicorn está incluído nas dependências. Configure o comando de inicialização do App Service como `gunicorn --bind=0.0.0.0 --timeout 600 core.wsgi:application`.
 - Defina `SECRET_KEY` por variável de ambiente ou secret manager.
 - Configure SMTP real para confirmação de e-mail e alertas.
 - Use HTTPS para que cookies `Secure` funcionem corretamente.
