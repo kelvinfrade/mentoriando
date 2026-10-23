@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,12 +28,13 @@ SECRET_KEY = 'django-insecure-d^6+h1+zi-!393^i40aaq6zzfv7ervq+xbfqpkq013v*f7l+30
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-    if host.strip()
-]
+ALLOWED_HOSTS = ['*']
 
+#[
+#    host.strip()
+#    for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+#    if host.strip()
+#]
 
 # Application definition
 
@@ -81,20 +83,52 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
+DEPLOYMENT_ENV = os.getenv('DJANGO_ENV', 'local').strip().lower()
+if DEPLOYMENT_ENV not in {'local', 'production'}:
+    raise ImproperlyConfigured('DJANGO_ENV deve ser "local" ou "production".')
+
+if DEPLOYMENT_ENV == 'production':
+    required_database_settings = (
+        'POSTGRES_DB',
+        'POSTGRES_USER',
+        'POSTGRES_PASSWORD',
+        'POSTGRES_HOST',
+    )
+    missing_database_settings = [
+        name for name in required_database_settings
+        if not os.getenv(name)
+    ]
+    if missing_database_settings:
+        raise ImproperlyConfigured(
+            'Configure as variáveis do PostgreSQL de produção: '
+            + ', '.join(missing_database_settings)
+        )
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', ''),
-        'USER': os.getenv('POSTGRES_USER', ''),
+        'NAME': os.getenv(
+            'POSTGRES_DB',
+            'mentoriando_local' if DEPLOYMENT_ENV == 'local' else '',
+        ),
+        'USER': os.getenv(
+            'POSTGRES_USER',
+            'postgres' if DEPLOYMENT_ENV == 'local' else '',
+        ),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('POSTGRES_HOST', ''),
+        'HOST': os.getenv(
+            'POSTGRES_HOST',
+            '127.0.0.1' if DEPLOYMENT_ENV == 'local' else '',
+        ),
         'PORT': os.getenv('POSTGRES_PORT', '5432'),
         'CONN_MAX_AGE': 600,
         'OPTIONS': {
-            'sslmode': os.getenv('POSTGRES_SSLMODE', 'require'),
+            'sslmode': os.getenv(
+                'POSTGRES_SSLMODE',
+                'disable' if DEPLOYMENT_ENV == 'local' else 'require',
+            ),
         },
     }
 }
@@ -161,9 +195,15 @@ LOGIN_URL = '/usuarios/login/'
 
 # Cookies de sessão e CSRF devem trafegar somente com HTTPS em produção.
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'True').lower() == 'true'
+SESSION_COOKIE_SECURE = os.getenv(
+    'SESSION_COOKIE_SECURE',
+    'True' if DEPLOYMENT_ENV == 'production' else 'False',
+).lower() == 'true'
 SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'True').lower() == 'true'
+CSRF_COOKIE_SECURE = os.getenv(
+    'CSRF_COOKIE_SECURE',
+    'True' if DEPLOYMENT_ENV == 'production' else 'False',
+).lower() == 'true'
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 1800
 SESSION_SAVE_EVERY_REQUEST = True
