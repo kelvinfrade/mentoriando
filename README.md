@@ -186,6 +186,18 @@ O celular deve conter 11 dígitos no padrão brasileiro: dois dígitos de DDD, s
 - MFA usa TOTP e deve ser ativado em **Segurança**.
 - A finalidade do CPF e os direitos do titular estão documentados em [PRIVACIDADE.md](PRIVACIDADE.md) e [TERMOS_DE_USO.md](TERMOS_DE_USO.md).
 
+### Controles relacionados ao OWASP Top 10 (2021)
+
+Os controles abaixo mitigam aspectos das categorias indicadas; não representam cobertura completa do OWASP Top 10 nem uma certificação de segurança.
+
+| Categoria | Controles implementados | Onde encontrar |
+| --- | --- | --- |
+| **A02:2021 – Falhas Criptográficas** | O Django armazena senhas usando hash, não em texto claro. CPF e celular são cifrados com Fernet antes da persistência; os tokens de confirmação de e-mail são armazenados como hash. | `usuarios/forms.py` (`CadastroForm.save`, que usa `create_user`); `usuarios/models.py` (`_fernet`, setters de `cpf` e `celular`, `create_email_verification_token`). |
+| **A05:2021 – Configuração de Segurança Incorreta** | `DEBUG` está desativado; há uma lista explícita de hosts permitidos; o middleware inclui proteção CSRF e contra clickjacking. O formulário de login inclui o token CSRF. | `core/settings.py` (`DEBUG`, `ALLOWED_HOSTS` e `MIDDLEWARE`); `usuarios/templates/login.html` (formulário de login). |
+| **A07:2021 – Falhas de Identificação e Autenticação** | O login usa a autenticação do Django, limita tentativas de senha e MFA por cinco falhas durante cinco minutos, permite exigir MFA por TOTP e só ativa a conta após confirmação do e-mail. | `usuarios/views.py` (`login` e `cadastro`); `usuarios/models.py` (`UserProfile.verify_email`); `usuarios/tests.py` (testes de login, MFA, bloqueio por tentativas e confirmação de conta). |
+
+**Ressalva para produção:** em `core/settings.py`, `SECRET_KEY` está definida diretamente no código e é usada para derivar a chave Fernet em `usuarios/models.py`. Antes de publicar, substitua esse valor por um segredo forte fornecido por variável de ambiente ou secret manager; a configuração atual não lê `SECRET_KEY` do ambiente.
+
 Antes de publicar, execute a checklist do Django:
 
 ```bash
