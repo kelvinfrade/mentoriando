@@ -31,6 +31,14 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['server-web-django-hsecahhphec4dwdw.westus3-01.azurewebsites.net', 'localhost', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://server-web-django-hsecahhphec4dwdw.westus3-01.azurewebsites.net',
+    cast=lambda v: [s.strip() for s in v.split(',')]
+)
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 
 INSTALLED_APPS = [
