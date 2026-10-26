@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
@@ -6,10 +6,4 @@ class Migration(migrations.Migration):
         ('usuarios', '0007_userprofile'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='userprofile',
-            name='session_version',
-            field=models.PositiveIntegerField(default=1),
-        ),
-    ]
+    operations = []

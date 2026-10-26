@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from django.contrib.messages import constants
 from django.core.exceptions import ImproperlyConfigured
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -103,26 +104,15 @@ if DEPLOYMENT_ENV == 'production':
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv(
-            'POSTGRES_DB',
-            'mentoriando_local' if DEPLOYMENT_ENV == 'local' else '',
-        ),
-        'USER': os.getenv(
-            'POSTGRES_USER',
-            'postgres' if DEPLOYMENT_ENV == 'local' else '',
-        ),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv(
-            'POSTGRES_HOST',
-            '127.0.0.1' if DEPLOYMENT_ENV == 'local' else '',
-        ),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
-        'CONN_MAX_AGE': 600,
+        # Sem default para credenciais críticas:
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        # Portas e fallbacks não sensíveis podem ter default seguro:
+        'PORT': config('DB_PORT', default='5432', cast=int),
         'OPTIONS': {
-            'sslmode': os.getenv(
-                'POSTGRES_SSLMODE',
-                'disable' if DEPLOYMENT_ENV == 'local' else 'require',
-            ),
+            'sslmode': 'require',
         },
     }
 }
