@@ -20,6 +20,25 @@ class ClientIPTests(SimpleTestCase):
 		)
 		self.assertEqual(get_client_ip(request), '203.0.113.8')
 
+	def test_removes_port_from_forwarded_ipv4(self):
+		request = self.factory.get(
+			'/',
+			HTTP_X_FORWARDED_FOR='179.63.12.230:65003, 10.0.0.1',
+		)
+		self.assertEqual(get_client_ip(request), '179.63.12.230')
+
+	def test_removes_port_from_remote_ipv4(self):
+		request = self.factory.get('/', REMOTE_ADDR='179.63.12.230:65003')
+		self.assertEqual(get_client_ip(request), '179.63.12.230')
+
+	def test_removes_port_from_bracketed_ipv6(self):
+		request = self.factory.get('/', REMOTE_ADDR='[2001:db8::1]:65003')
+		self.assertEqual(get_client_ip(request), '2001:db8::1')
+
+	def test_preserves_unbracketed_ipv6(self):
+		request = self.factory.get('/', REMOTE_ADDR='2001:db8::1')
+		self.assertEqual(get_client_ip(request), '2001:db8::1')
+
 	def test_falls_back_to_remote_addr_without_forwarded_ip(self):
 		request = self.factory.get('/', REMOTE_ADDR='169.254.129.1')
 		self.assertEqual(get_client_ip(request), '169.254.129.1')

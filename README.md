@@ -183,7 +183,7 @@ O celular deve conter 11 dígitos no padrão brasileiro: dois dígitos de DDD, s
 - Cookies possuem `HttpOnly`, `SameSite=Lax` e configuração `Secure` para HTTPS.
 - Sessões podem ser revogadas por meio de **Sair de todos**.
 - Login e MFA possuem limite temporário de tentativas por IP e usuário.
-- A captura do IP do cliente prioriza o primeiro endereço de `X-Forwarded-For` e usa `REMOTE_ADDR` como fallback. Configure a aplicação atrás de um proxy confiável que defina esse cabeçalho; não confie nele quando clientes puderem fornecê-lo diretamente.
+- A captura do IP do cliente prioriza o primeiro endereço de `X-Forwarded-For` e usa `REMOTE_ADDR` como fallback; remove portas de IPv4 e de IPv6 entre colchetes, preservando IPv6 sem colchetes. Configure a aplicação atrás de um proxy confiável que defina esse cabeçalho; não confie nele quando clientes puderem fornecê-lo diretamente.
 - MFA usa TOTP e deve ser ativado em **Segurança**.
 - A finalidade do CPF e os direitos do titular estão documentados em [PRIVACIDADE.md](PRIVACIDADE.md) e [TERMOS_DE_USO.md](TERMOS_DE_USO.md).
 
@@ -223,6 +223,13 @@ requirements.txt   Dependências Python fixadas
 
 - Não use `runserver` como servidor de produção.
 - Configure `DEBUG=False` e `ALLOWED_HOSTS` explicitamente.
+- O WhiteNoise está configurado em `core/settings.py` para servir os estáticos coletados de `static/` para `staticfiles/`, com compressão e nomes versionados. Inclua a coleta no processo de build/deploy, antes de iniciar o Gunicorn:
+
+  ```bash
+  python manage.py collectstatic --noinput
+  ```
+
+- Se a aplicação for publicada sem estilos ou imagens, confirme que `collectstatic` foi executado no mesmo ambiente e que o diretório `staticfiles/` está incluído na implantação.
 - O Gunicorn está incluído nas dependências. Configure o comando de inicialização do App Service como `gunicorn --bind=0.0.0.0 --timeout 600 core.wsgi:application`.
 - Defina `SECRET_KEY` por variável de ambiente ou secret manager.
 - Configure SMTP real para confirmação de e-mail e alertas.
