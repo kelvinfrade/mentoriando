@@ -183,6 +183,7 @@ O celular deve conter 11 dígitos no padrão brasileiro: dois dígitos de DDD, s
 - Cookies possuem `HttpOnly`, `SameSite=Lax` e configuração `Secure` para HTTPS.
 - Sessões podem ser revogadas por meio de **Sair de todos**.
 - Login e MFA possuem limite temporário de tentativas por IP e usuário.
+- A captura do IP do cliente prioriza o primeiro endereço de `X-Forwarded-For` e usa `REMOTE_ADDR` como fallback. Configure a aplicação atrás de um proxy confiável que defina esse cabeçalho; não confie nele quando clientes puderem fornecê-lo diretamente.
 - MFA usa TOTP e deve ser ativado em **Segurança**.
 - A finalidade do CPF e os direitos do titular estão documentados em [PRIVACIDADE.md](PRIVACIDADE.md) e [TERMOS_DE_USO.md](TERMOS_DE_USO.md).
 

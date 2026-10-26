@@ -15,6 +15,7 @@ import re
 
 from .forms import CadastroForm
 from .models import UserProfile
+from .utils import get_client_ip
 import pyotp
 
 # Create your views here.
@@ -75,7 +76,7 @@ def login(request):
         username = request.POST.get('username')
         senha = request.POST.get('senha')
         
-        ip = request.META.get('REMOTE_ADDR', 'unknown')
+        ip = get_client_ip(request)
         chave_ip = f'login-falhas-ip:{ip}'
         chave_usuario = f'login-falhas-usuario:{(username or "").strip().lower()}'
         tentativas = max(cache.get(chave_ip, 0), cache.get(chave_usuario, 0))

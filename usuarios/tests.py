@@ -1,10 +1,28 @@
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 
 from .forms import CadastroForm
 from .models import UserProfile
+from .utils import get_client_ip
 import pyotp
+
+
+class ClientIPTests(SimpleTestCase):
+	def setUp(self):
+		self.factory = RequestFactory()
+
+	def test_uses_first_forwarded_ip(self):
+		request = self.factory.get(
+			'/',
+			HTTP_X_FORWARDED_FOR='203.0.113.8, 10.0.0.1',
+			REMOTE_ADDR='169.254.129.1',
+		)
+		self.assertEqual(get_client_ip(request), '203.0.113.8')
+
+	def test_falls_back_to_remote_addr_without_forwarded_ip(self):
+		request = self.factory.get('/', REMOTE_ADDR='169.254.129.1')
+		self.assertEqual(get_client_ip(request), '169.254.129.1')
 
 
 class CadastroTests(TestCase):

@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from .utils import get_client_ip
+
 
 def _fernet():
 	key = base64.urlsafe_b64encode(hashlib.sha256(settings.SECRET_KEY.encode()).digest())
@@ -113,5 +115,5 @@ class UserProfile(models.Model):
 
 	@staticmethod
 	def device_hash(request):
-		value = f'{request.META.get("REMOTE_ADDR", "")}:{request.META.get("HTTP_USER_AGENT", "")}'
+		value = f'{get_client_ip(request)}:{request.META.get("HTTP_USER_AGENT", "")}'
 		return hashlib.sha256(value.encode()).hexdigest()
